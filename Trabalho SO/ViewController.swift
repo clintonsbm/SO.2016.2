@@ -10,16 +10,32 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    var basketSize: Int?
+    
+    var basket: Basket? = nil
+    
+    var kidsArray: [Kid] = []
+    
+    var instantiateKidView = InstantiateKidView()
+    
+    //InstantiateKidView propreties
+    @IBOutlet weak var kidLabel: UILabel!
+    
+    @IBOutlet weak var ballSwitch: UISwitch!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        self.basket = Basket(size: self.basketSize!)
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    @IBAction func zzzzz(_ sender: Any) {
+        self.instantiateKidView.setupView(in: self, kidNumber: self.kidsArray.count+1)
     }
-
-
 }
 
+extension ViewController: CreateKitDelegate {
+    func createKit(withBall: Bool, playTime: Int) {
+        print("Instantiate kid")
+    }
+}
