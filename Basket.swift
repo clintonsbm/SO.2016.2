@@ -10,6 +10,7 @@ import UIKit
 
 class Basket: NSObject {
     var size: Int
+    var currentBalls: Int = 0
     
     init(size: Int) {
         self.size = size

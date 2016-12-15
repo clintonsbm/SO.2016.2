@@ -30,7 +30,7 @@ class InitialViewController: UIViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
        
-        let destination = segue.destination as! ViewController
+        let destination = segue.destination as! MainViewController
         
         destination.basketSize = self.basketSize
     }

@@ -13,27 +13,27 @@ class InstantiateKidView: UIView {
     
     var playTime = 1
     
-    var viewController: ViewController?
-    
     var delegate: CreateKitDelegate?
     
+    /*
     func setupView(in viewController: UIViewController, kidNumber: Int) {
-        self.viewController = (viewController as! ViewController)
+    
         self.delegate = self.viewController
         
         self.viewController?.kidLabel.text = "Kid \(kidNumber)"
 
-        self.center = CGPoint(x: self.superview!
+        self.center = CGPoint(x: self.viewController?.view
             .frame.midX, y: self.superview!.frame.midY)
         self.layer.cornerRadius = 10
         self.superview!.addSubview(self)
         self.transform = self.transform.scaledBy(x: 0.1, y: 0.1)
         self.alpha = 0
-    }
-    
+    }*/
+   
+    /*
     @IBAction func done(_ sender: Any) {
         self.delegate?.createKit(withBall: (self.viewController?.ballSwitch.isOn)!, playTime: self.playTime)
-    }
+    }*/
     
 }
 
