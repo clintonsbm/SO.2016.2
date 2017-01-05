@@ -14,7 +14,7 @@ class InitialViewController: UIViewController {
     
     let pickerOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     
-    var basketSize = 0
+    var basketSize = 1
     
     override func viewDidLoad() {
         super.viewDidLoad()

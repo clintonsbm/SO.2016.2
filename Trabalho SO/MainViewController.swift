@@ -21,10 +21,13 @@ class MainViewController: UIViewController {
     
     @IBOutlet weak var kidLabel: UILabel!
     @IBOutlet weak var ballSwitch: UISwitch!
-    @IBOutlet weak var picker: UIPickerView!
+    @IBOutlet weak var playPicker: UIPickerView!
+    @IBOutlet weak var spendPicker: UIPickerView!
     
     let pickerOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+    
     var playTime = 1
+    var spendTime = 1
     
     //Semaphores
     var mutex = DispatchSemaphore(value: 1)
@@ -34,8 +37,11 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     
-        self.picker.delegate = self
-        self.picker.dataSource = self
+        self.playPicker.delegate = self
+        self.playPicker.dataSource = self
+        
+        self.spendPicker.delegate = self
+        self.spendPicker.dataSource = self
         
         self.basket = Basket(size: self.basketSize!)
         self.empty = DispatchSemaphore(value: self.basketSize!)
@@ -50,8 +56,10 @@ extension MainViewController {
    
     ///Semaphore code
     @IBAction func startAplication(_ sender: Any) {
-        while true {
-            //
+        for kid in self.kidsArray {
+            let _ = DispatchQueue(label: "\(kid.id)").async {
+                kid.startKid()
+            }
         }
     }
 }
@@ -60,9 +68,13 @@ extension MainViewController {
     
     ///IntantiateKidView functions
     @IBAction func doneInstantiatingKid(_ sender: UIButton) {
-        self.kidsArray.append(Kid(id: self.kidsArray.count+1,haveBall: self.ballSwitch.isOn, playTime: self.playTime, semaphores: [self.mutex, self.empty!, self.full]))
+        let kid = Kid(id: self.kidsArray.count+1, haveBall: self.ballSwitch.isOn, playTime: self.playTime, doNothingTime: self.spendTime, semaphores: [self.mutex, self.empty!, self.full], basket: self.basket!)
+        
+        self.kidsArray.append(kid)
         
         self.instantiateKidView.removeFromSuperview()
+        
+        //kid.startKid()
     }
     
     func setupView() {
@@ -93,7 +105,12 @@ extension MainViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        self.playTime = self.pickerOptions[row]
+        
+        if pickerView == self.playPicker{
+            self.playTime = self.pickerOptions[row]
+        } else {
+            self.spendTime = self.pickerOptions[row]
+        }
     }
 
 }
