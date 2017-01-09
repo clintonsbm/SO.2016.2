@@ -74,7 +74,9 @@ extension MainViewController {
         
         self.instantiateKidView.removeFromSuperview()
         
-        //kid.startKid()
+        let _ = DispatchQueue(label: "\(kid.id)").async {
+            kid.startKid()
+        }
     }
     
     func setupView() {

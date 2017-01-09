@@ -40,11 +40,7 @@ class Kid: NSObject {
     }
     
     func startKid() {
-        print("mutex: \(self.mutex.description)")
-        print("empty: \(self.empty)")
-        print("full: \(self.full)")
-        
-        //while true {
+        while true {
             if self.haveBall {
                 
                 print("Kid \(self.id) have ball")
@@ -81,7 +77,7 @@ class Kid: NSObject {
             
             print("Kid \(self.id) do nothing phase")
             self.doNothing()
-       // }
+        }
     }
     
     func play() {
