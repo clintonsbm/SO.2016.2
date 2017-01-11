@@ -21,12 +21,22 @@ class Kid: NSObject {
     
     let basket: Basket?
     
+    var isStopped: Bool = false
+    
     //Semaphores
     var mutex: DispatchSemaphore
     var empty: DispatchSemaphore
     var full: DispatchSemaphore
     
-    init(id: Int, haveBall: Bool, playTime: Int, doNothingTime: Int, semaphores: [DispatchSemaphore], basket: Basket) {
+    //Text prompt
+    var textPrompt: UITextView!
+    
+    //Kid images
+    var playImage: UIImageView
+    var waitImage: UIImageView
+    var doNothingImage: UIImageView
+    
+    init(id: Int, haveBall: Bool, playTime: Int, doNothingTime: Int, semaphores: [DispatchSemaphore], basket: Basket, textPrompt: UITextView, images: [UIImageView]) {
         self.id = id
         self.haveBall = haveBall
         self.playTime = playTime
@@ -37,20 +47,33 @@ class Kid: NSObject {
         self.full = semaphores[2]
         
         self.basket = basket
+        
+        self.textPrompt = textPrompt
+        
+        self.playImage = images[0]
+        self.waitImage = images[1]
+        self.doNothingImage = images[2]
     }
     
     func startKid() {
-        while true {
+        while !self.isStopped {
             if self.haveBall {
                 
-                print("Kid \(self.id) have ball")
-                print("Kid \(self.id) play phase")
+                DispatchQueue.main.async {
+                    self.textPrompt.insertText("Kid \(self.id) have ball\n")
+                    self.textPrompt.insertText("Kid \(self.id) play phase\n")
+                }
+                
                 self.play()
                 
             } else {
                 
-                print("Kid \(self.id) dont have ball")
-                print("Kid \(self.id) wait phase")
+                DispatchQueue.main.async {
+                    self.textPrompt.insertText("Kid \(self.id) dont have ball\n")
+                    self.textPrompt.insertText("Kid \(self.id) wait phase\n")
+                    self.waitImage.isHidden = false
+                }
+
                 self.full.wait()
                 self.mutex.wait()
                 
@@ -59,29 +82,48 @@ class Kid: NSObject {
                 self.mutex.signal()
                 self.empty.signal()
                 
-                print("Kid \(self.id) taked ball")
-                print("Kid \(self.id) play phase")
+                DispatchQueue.main.async {
+                    self.waitImage.isHidden = true
+                    self.textPrompt.insertText("Kid \(self.id) play phase\n")
+                }
+                
                 self.play()
             }
             
-            print("Kid \(self.id) have ball")
-            print("Kid \(self.id) try to return ball phase")
+            DispatchQueue.main.async {
+                self.waitImage.isHidden = false
+                self.textPrompt.insertText("Kid \(self.id) have ball\n")
+                self.textPrompt.insertText("Kid \(self.id) try to return ball phase\n")
+            }
+            
             self.empty.wait()
             self.mutex.wait()
             
-            print("Kid \(self.id) place the ball phase")
+            DispatchQueue.main.async {
+                self.waitImage.isHidden = true
+                self.textPrompt.insertText("Kid \(self.id) place the ball phase\n")
+            }
+            
             self.putTheBall()
             
             self.mutex.signal()
             self.full.signal()
             
-            print("Kid \(self.id) do nothing phase")
+            DispatchQueue.main.async {
+                self.textPrompt.insertText("Kid \(self.id) do nothing phase\n")
+            }
+            
             self.doNothing()
         }
     }
     
     func play() {
-        print("Kid \(self.id) is playing")
+        
+        DispatchQueue.main.async {
+            self.playImage.isHidden = false
+            self.textPrompt.insertText("Kid \(self.id) is playing\n")
+        }
+        
         self.isPlaying = true
         
         let currentDate = Date()
@@ -91,11 +133,19 @@ class Kid: NSObject {
             i += 1
         }
         
-        print("Kid \(self.id) stoped playing ")
+        DispatchQueue.main.async {
+            self.playImage.isHidden = true
+            self.textPrompt.insertText("Kid \(self.id) stoped playing\n")
+        }
     }
     
     func doNothing() {
-        print("Kid \(self.id) is doing nothing")
+        
+        DispatchQueue.main.async {
+            self.doNothingImage.isHidden = false
+            self.textPrompt.insertText("Kid \(self.id) is doing nothing\n")
+        }
+        
         self.isPlaying = false
         
         let currentDate = Date()
@@ -105,18 +155,36 @@ class Kid: NSObject {
             i += 1
         }
         
-        print("Kid \(self.id) stoped doing nothing")
+        DispatchQueue.main.async {
+            self.doNothingImage.isHidden = true
+            self.textPrompt.insertText("Kid \(self.id) stoped doing nothing\n")
+        }
     }
     
     func takeBall() {
-        print("Kid \(self.id) taked ball")
+        
+        DispatchQueue.main.async {
+            self.textPrompt.insertText("Kid \(self.id) taked ball\n")
+        }
+        
         self.basket!.currentBalls -= 1
         self.haveBall = true
     }
     
     func putTheBall() {
-        print("Kid \(self.id) puted the ball")
+        
+        DispatchQueue.main.async {
+            self.textPrompt.insertText("Kid \(self.id) puted the ball\n")
+        }
+        
         self.basket!.currentBalls += 1
         self.haveBall = false
+    }
+}
+
+extension Kid {
+    ///Show on prompt function
+    func showOnPrompt(text: String) {
+        self.textPrompt.insertText("oi")
     }
 }

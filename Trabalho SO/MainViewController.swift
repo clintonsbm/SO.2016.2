@@ -29,6 +29,12 @@ class MainViewController: UIViewController {
     var playTime = 1
     var spendTime = 1
     
+    //text prompt
+    @IBOutlet weak var textPrompt: UITextView!
+    
+    //Instantiate kid buttons
+    @IBOutlet weak var instantiateKidButton: UIButton!
+    
     //Semaphores
     var mutex = DispatchSemaphore(value: 1)
     var empty: DispatchSemaphore?
@@ -36,7 +42,9 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-    
+        
+        self.textPrompt.delegate = self
+        
         self.playPicker.delegate = self
         self.playPicker.dataSource = self
         
@@ -50,25 +58,23 @@ class MainViewController: UIViewController {
     @IBAction func callInstantiateKidView(_ sender: UIButton) {
         self.setupView()
     }
-}
-
-extension MainViewController {
-   
-    ///Semaphore code
-    @IBAction func startAplication(_ sender: Any) {
+    
+    @IBAction func stopKids(_ sender: UIButton) {
         for kid in self.kidsArray {
-            let _ = DispatchQueue(label: "\(kid.id)").async {
-                kid.startKid()
-            }
+            kid.isStopped = true
         }
     }
 }
 
 extension MainViewController {
     
-    ///IntantiateKidView functions
+    ///IntantiateKidView functions and start kid
     @IBAction func doneInstantiatingKid(_ sender: UIButton) {
-        let kid = Kid(id: self.kidsArray.count+1, haveBall: self.ballSwitch.isOn, playTime: self.playTime, doNothingTime: self.spendTime, semaphores: [self.mutex, self.empty!, self.full], basket: self.basket!)
+        let imagePlay = self.view.viewWithTag(self.kidsArray.count+1) as! UIImageView
+        let imageWait = self.view.viewWithTag(self.kidsArray.count+11) as! UIImageView
+        let imageDoNothing = self.view.viewWithTag(self.kidsArray.count+21) as! UIImageView
+        
+        let kid = Kid(id: self.kidsArray.count, haveBall: self.ballSwitch.isOn, playTime: self.playTime, doNothingTime: self.spendTime, semaphores: [self.mutex, self.empty!, self.full], basket: self.basket!, textPrompt: self.textPrompt, images: [imagePlay, imageWait, imageDoNothing])
         
         self.kidsArray.append(kid)
         
@@ -77,11 +83,16 @@ extension MainViewController {
         let _ = DispatchQueue(label: "\(kid.id)").async {
             kid.startKid()
         }
+        
+        if self.kidsArray.count == 10 {
+            self.instantiateKidButton.isHidden = true
+        
+        }
     }
     
     func setupView() {
         
-        self.kidLabel.text = "Kid \(self.kidsArray.count+1)"
+        self.kidLabel.text = "Kid \(self.kidsArray.count)"
         
         self.instantiateKidView.center = CGPoint(x: self.view
             .frame.midX, y: self.view.frame.midY)
@@ -115,4 +126,11 @@ extension MainViewController: UIPickerViewDelegate, UIPickerViewDataSource {
         }
     }
 
+}
+
+extension MainViewController: UITextViewDelegate {
+    func textViewDidChange(_ textView: UITextView) {
+        let range = NSMakeRange(textView.text.characters.count - 1, 0)
+        textView.scrollRangeToVisible(range)
+    }
 }
