@@ -115,6 +115,10 @@ class Kid: NSObject {
             
             self.doNothing()
         }
+        
+        self.playImage.isHidden = true
+        self.waitImage.isHidden = false
+        self.doNothingImage.isHidden = true
     }
     
     func play() {
