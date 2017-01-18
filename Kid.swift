@@ -30,13 +30,19 @@ class Kid: NSObject {
     
     //Text prompt
     var textPrompt: UITextView!
+    var basketLabel: UILabel
+    
+    //Label indicator
+    var labelPlay: UILabel
+    var labelDoNothing: UILabel
     
     //Kid images
     var playImage: UIImageView
-    var waitImage: UIImageView
+    var waitForBallImage: UIImageView
+    var waitForVacancyImage: UIImageView
     var doNothingImage: UIImageView
     
-    init(id: Int, haveBall: Bool, playTime: Int, doNothingTime: Int, semaphores: [DispatchSemaphore], basket: Basket, textPrompt: UITextView, images: [UIImageView]) {
+    init(id: Int, haveBall: Bool, playTime: Int, doNothingTime: Int, semaphores: [DispatchSemaphore], basket: Basket, textPrompt: UITextView, images: [UIImageView], basketLabel: UILabel, activity: [UILabel]) {
         self.id = id
         self.haveBall = haveBall
         self.playTime = playTime
@@ -49,10 +55,15 @@ class Kid: NSObject {
         self.basket = basket
         
         self.textPrompt = textPrompt
+        self.basketLabel = basketLabel
+        
+        self.labelPlay = activity[0]
+        self.labelDoNothing = activity[1]
         
         self.playImage = images[0]
-        self.waitImage = images[1]
-        self.doNothingImage = images[2]
+        self.waitForBallImage = images[1]
+        self.waitForVacancyImage = images[2]
+        self.doNothingImage = images[3]
     }
     
     func startKid() {
@@ -71,7 +82,7 @@ class Kid: NSObject {
                 DispatchQueue.main.async {
                     self.textPrompt.insertText("Kid \(self.id) dont have ball\n")
                     self.textPrompt.insertText("Kid \(self.id) wait phase\n")
-                    self.waitImage.isHidden = false
+                    self.waitForBallImage.isHidden = false
                 }
 
                 self.full.wait()
@@ -83,7 +94,7 @@ class Kid: NSObject {
                 self.empty.signal()
                 
                 DispatchQueue.main.async {
-                    self.waitImage.isHidden = true
+                    self.waitForBallImage.isHidden = true
                     self.textPrompt.insertText("Kid \(self.id) play phase\n")
                 }
                 
@@ -91,7 +102,7 @@ class Kid: NSObject {
             }
             
             DispatchQueue.main.async {
-                self.waitImage.isHidden = false
+                self.waitForVacancyImage.isHidden = false
                 self.textPrompt.insertText("Kid \(self.id) have ball\n")
                 self.textPrompt.insertText("Kid \(self.id) try to return ball phase\n")
             }
@@ -100,7 +111,7 @@ class Kid: NSObject {
             self.mutex.wait()
             
             DispatchQueue.main.async {
-                self.waitImage.isHidden = true
+                self.waitForVacancyImage.isHidden = true
                 self.textPrompt.insertText("Kid \(self.id) place the ball phase\n")
             }
             
@@ -117,7 +128,8 @@ class Kid: NSObject {
         }
         
         self.playImage.isHidden = true
-        self.waitImage.isHidden = false
+        self.waitForBallImage.isHidden = false
+        self.waitForVacancyImage.isHidden = false
         self.doNothingImage.isHidden = true
     }
     
@@ -125,6 +137,7 @@ class Kid: NSObject {
         
         DispatchQueue.main.async {
             self.playImage.isHidden = false
+            self.labelPlay.isHidden = false
             self.textPrompt.insertText("Kid \(self.id) is playing\n")
         }
         
@@ -133,12 +146,31 @@ class Kid: NSObject {
         let currentDate = Date()
         var i = 0
         
+        var lastValue = 0
+        
         while (Int(currentDate.timeIntervalSinceNow) != Int(-self.playTime)) {
             i += 1
+            
+            let value = Int(i/1000000)
+            
+            if value != lastValue {
+                DispatchQueue.main.async {
+                    self.labelPlay.text = "\(value)"
+                }
+                
+                print("\(value) and \(lastValue)")
+            }
+            
+            lastValue = value
+            
+            if i > 100000000 {
+                i = 0
+            }
         }
         
         DispatchQueue.main.async {
             self.playImage.isHidden = true
+            self.labelPlay.isHidden = true
             self.textPrompt.insertText("Kid \(self.id) stoped playing\n")
         }
     }
@@ -147,20 +179,41 @@ class Kid: NSObject {
         
         DispatchQueue.main.async {
             self.doNothingImage.isHidden = false
+            self.labelDoNothing.isHidden = false
             self.textPrompt.insertText("Kid \(self.id) is doing nothing\n")
         }
         
         self.isPlaying = false
         
         let currentDate = Date()
+        
         var i = 0
+        
+        var lastValue = 0
         
         while (Int(currentDate.timeIntervalSinceNow) != Int(-self.doNothingTime)) {
             i += 1
+            
+            let value = Int(i/1000000)
+            
+            if value != lastValue {
+                DispatchQueue.main.async {
+                    self.labelDoNothing.text = "\(value)"
+                }
+                
+                print("\(value) and \(lastValue)")
+            }
+            
+            lastValue = value
+            
+            if i > 100000000 {
+                i = 0
+            }
         }
         
         DispatchQueue.main.async {
             self.doNothingImage.isHidden = true
+            self.labelDoNothing.isHidden = true
             self.textPrompt.insertText("Kid \(self.id) stoped doing nothing\n")
         }
     }
@@ -171,7 +224,8 @@ class Kid: NSObject {
             self.textPrompt.insertText("Kid \(self.id) taked ball\n")
         }
         
-        self.basket!.currentBalls -= 1
+        //self.basket!.currentBalls -= 1
+        self.basket!.takeBall()
         self.haveBall = true
     }
     
@@ -181,7 +235,8 @@ class Kid: NSObject {
             self.textPrompt.insertText("Kid \(self.id) puted the ball\n")
         }
         
-        self.basket!.currentBalls += 1
+        //self.basket!.currentBalls += 1
+        self.basket!.placeBall()
         self.haveBall = false
     }
 }

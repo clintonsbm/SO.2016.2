@@ -32,6 +32,8 @@ class MainViewController: UIViewController {
     //text prompt
     @IBOutlet weak var textPrompt: UITextView!
     
+    @IBOutlet weak var basketLabel: UILabel!
+    
     //Instantiate kid buttons
     @IBOutlet weak var instantiateKidButton: UIButton!
     
@@ -51,7 +53,10 @@ class MainViewController: UIViewController {
         self.spendPicker.delegate = self
         self.spendPicker.dataSource = self
         
-        self.basket = Basket(size: self.basketSize!)
+        self.basket = Basket(size: self.basketSize!, label: self.basketLabel)
+        
+        self.basketLabel.text = "\(self.basket!.currentBalls)/\(self.basket!.size)"
+        
         self.empty = DispatchSemaphore(value: self.basketSize!)
     }
 
@@ -71,10 +76,15 @@ extension MainViewController {
     ///IntantiateKidView functions and start kid
     @IBAction func doneInstantiatingKid(_ sender: UIButton) {
         let imagePlay = self.view.viewWithTag(self.kidsArray.count+1) as! UIImageView
-        let imageWait = self.view.viewWithTag(self.kidsArray.count+11) as! UIImageView
+        let imageWaitForBall = self.view.viewWithTag(self.kidsArray.count+11) as! UIImageView
+        let imageWaitForVacancy = self.view.viewWithTag(self.kidsArray.count+40) as! UIImageView
         let imageDoNothing = self.view.viewWithTag(self.kidsArray.count+21) as! UIImageView
         
-        let kid = Kid(id: self.kidsArray.count, haveBall: self.ballSwitch.isOn, playTime: self.playTime, doNothingTime: self.spendTime, semaphores: [self.mutex, self.empty!, self.full], basket: self.basket!, textPrompt: self.textPrompt, images: [imagePlay, imageWait, imageDoNothing])
+        let labelPlay = self.view.viewWithTag(self.kidsArray.count+100) as! UILabel
+        
+        let labelDoNothing = self.view.viewWithTag(self.kidsArray.count+200) as! UILabel
+        
+        let kid = Kid(id: self.kidsArray.count, haveBall: self.ballSwitch.isOn, playTime: self.playTime, doNothingTime: self.spendTime, semaphores: [self.mutex, self.empty!, self.full], basket: self.basket!, textPrompt: self.textPrompt, images: [imagePlay, imageWaitForBall, imageWaitForVacancy, imageDoNothing], basketLabel: self.basketLabel, activity: [labelPlay, labelDoNothing])
         
         self.kidsArray.append(kid)
         
