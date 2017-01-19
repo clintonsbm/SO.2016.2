@@ -40,4 +40,4 @@ espaço para que ela coloque sua bola ou quieta).
 A aplicação foi desenvolvida em Swift 3 com a interface sem considerar constraints e voltada para o iPad Air.
 
 ##Demo
-[[https://github.com/clintonsbm/SO.2016.2/blob/master/Demo/ezgif.com-gif-maker.gif]]
+![alt tag](https://github.com/clintonsbm/SO.2016.2/blob/master/Demo/ezgif.com-gif-maker.gif)
