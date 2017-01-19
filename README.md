@@ -1,5 +1,6 @@
 # SO.2016.2
 Trabalho de Sistemas Operacionais - IFCE - Campus Benfica - 2016.2 - Professor Fernando Parente
+
 Desenvolvido por: Clinton de Sá, Daniel Bernardo e Rui Moreno.
 
 ## Objetivo 
